@@ -27,7 +27,7 @@ trait Vector2D:
 object Vector2D:
   // Factory method to create Vector2D instances
   def apply(x: Double, y: Double): Vector2D =
-    Vector2DImpl(x, y)
+    Vector2D(x, y)
 
   def unapply(vector: Vector2D): Option[(Double, Double)] =
     Some(vector.x, vector.y)
@@ -61,6 +61,22 @@ object Vector2D:
         obj.isInstanceOf[Vector2D] && that.x == x && that.y == y
       case _ => false
 
+case class Vector2DCaseClass(x: Double, y: Double) extends Vector2D:
+  override def +(other: Vector2D): Vector2D = other match
+    case Vector2DCaseClass(otherX, otherY) => Vector2DCaseClass(x + otherX, y + otherY)
+
+  override def -(other: Vector2D): Vector2D = other match
+    case Vector2DCaseClass(otherX, otherY) => Vector2DCaseClass(x - otherX, y - otherY)
+
+  override def *(scalar: Double): Vector2D =
+    Vector2DCaseClass(x * scalar, y * scalar)
+
+  override def dot(other: Vector2D): Double = other match
+    case Vector2DCaseClass(otherX, otherY) => x * otherX + y * otherY
+
+  override def magnitude: Double =
+    sqrt(exp(x) + exp(y))
+
 
 /** Hints:
  *   - Implement Vector2D with a Vector2DImpl class.
@@ -70,8 +86,8 @@ object Vector2D:
  *   - Observe how equality (==) and toString now work correctly out-of-the-box.
  */
 @main def checkVectors(): Unit =
-  val v1 = Vector2D(3.0, 4.0)
-  val v2 = Vector2D(-1.0, 2.0)
+  val v1 = Vector2DCaseClass(3.0, 4.0)
+  val v2 = Vector2DCaseClass(-1.0, 2.0)
 
   val sum = v1 + v2
   // Expected: (3 + (-1), 4 + 2) = (2.0, 6.0)
@@ -109,5 +125,5 @@ object Vector2D:
 
   println(v1.toString) // Should be "x: 3.0, y: 4.0"
   val v3 = v1 match
-    case Vector2D(x, y) => Vector2D(x, y)
+    case Vector2D(x, y) => Vector2DCaseClass(x, y)
   println(v1 == v3) // Should be true
