@@ -1,6 +1,7 @@
 package it.unibo.pps.ex
 
 import scala.math.sqrt // Needed for magnitude calculation
+import scala.math.exp
 
 // Represents a vector in 2D space
 // Structure: x-component and y-component
@@ -25,12 +26,40 @@ trait Vector2D:
 
 object Vector2D:
   // Factory method to create Vector2D instances
-  def apply(x: Double, y: Double): Vector2D = ???
+  def apply(x: Double, y: Double): Vector2D =
+    Vector2DImpl(x, y)
+
+  def unapply(vector: Vector2D): Option[(Double, Double)] =
+    Some(vector.x, vector.y)
 
   // Common vectors (optional but nice)
   val zero: Vector2D = apply(0.0, 0.0)
   val i: Vector2D = apply(1.0, 0.0) // Unit vector along x-axis
   val j: Vector2D = apply(0.0, 1.0) // Unit vector along y-axis
+
+  private class Vector2DImpl(override val x: Double, override val y: Double) extends Vector2D:
+    override def +(other: Vector2D): Vector2D = other match
+      case Vector2D(otherX, otherY) => Vector2D(x + otherX, y + otherY)
+
+    override def -(other: Vector2D): Vector2D = other match
+      case Vector2D(otherX, otherY) => Vector2D(x - otherX, y - otherY)
+
+    override def *(scalar: Double): Vector2D =
+      Vector2D(x * scalar, y * scalar)
+
+    override def dot(other: Vector2D): Double = other match
+      case Vector2D(otherX, otherY) => x * otherX + y * otherY
+
+    override def magnitude: Double =
+      sqrt(exp(x) + exp(y))
+
+    override def toString: String =
+      s"x: $x, y: $y"
+
+    override def equals(obj: Any): Boolean = obj match
+      case that: Vector2D =>
+        obj.isInstanceOf[Vector2D] && that.x == x && that.y == y
+      case _ => false
 
 
 /** Hints:
@@ -77,3 +106,8 @@ object Vector2D:
   // sum * 3.0 = (6.0, 18.0)
   // (6.0, 18.0) - (1.0, 1.0) = (5.0, 17.0)
   println(s"Multiple Ops: $multipleOps, x: ${multipleOps.x}, y: ${multipleOps.y}")
+
+  println(v1.toString) // Should be "x: 3.0, y: 4.0"
+  val v3 = v1 match
+    case Vector2D(x, y) => Vector2D(x, y)
+  println(v1 == v3) // Should be true
